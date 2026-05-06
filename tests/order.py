@@ -82,3 +82,9 @@ class OrderTests(APITestCase):
     # TODO: Complete order by adding payment type
 
     # TODO: New line item is not added to closed order
+
+    # TODO: Get Single Order
+
+    # TODO: Get All Orders
+
+    # TODO: Get ALL Orders for a Customer

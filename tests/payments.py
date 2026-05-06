@@ -41,3 +41,7 @@ class PaymentTests(APITestCase):
         self.assertEqual(json_response["create_date"], str(datetime.date.today()))
 
     # TODO: Delete payment type
+
+    # TODO Get Single Payment Type
+
+    # TODO Get All Payment Types

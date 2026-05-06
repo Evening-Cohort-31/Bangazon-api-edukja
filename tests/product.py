@@ -98,3 +98,7 @@ class ProductTests(APITestCase):
     # TODO: Delete product
 
     # TODO: Product can be rated. Assert average rating exists.
+
+    # TODO: GET Single Product
+
+    # TODO: POST Product Recommendation
