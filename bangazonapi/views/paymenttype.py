@@ -13,14 +13,20 @@ class PaymentSerializer(serializers.HyperlinkedModelSerializer):
     Arguments:
         serializers
     """
+    obscured_num = serializers.SerializerMethodField()
+
+    def get_obscured_num(self, obj):
+        number = obj.account_number
+        return f"{'*' * (len(number) - 4)}{number[-4:]}"
+
     class Meta:
         model = Payment
         url = serializers.HyperlinkedIdentityField(
             view_name='payment',
             lookup_field='id'
         )
-        fields = ('id', 'url', 'merchant_name', 'account_number',
-                  'expiration_date', 'create_date')
+        fields = ('id', 'url', 'merchant_name',
+                  'obscured_num', 'expiration_date', 'create_date')
 
 
 class Payments(ViewSet):
