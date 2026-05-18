@@ -1,5 +1,6 @@
 """View module for handling requests about customer shopping cart"""
 import datetime
+from django.db.models import Sum
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
@@ -109,7 +110,7 @@ class Cart(ViewSet):
         """
         current_user = Customer.objects.get(user=request.auth.user)
         try:
-            open_order = Order.objects.get(
+            open_order = Order.objects.annotate(total=Sum("lineitems__product__price")).get(
                 customer=current_user, payment_type=None)
 
             products_on_order = Product.objects.filter(
