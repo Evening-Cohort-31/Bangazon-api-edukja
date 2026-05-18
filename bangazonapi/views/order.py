@@ -1,6 +1,7 @@
 """View module for handling requests about customer order"""
 import datetime
 from django.http import HttpResponseServerError
+from django.db.models import Sum
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
@@ -28,6 +29,7 @@ class OrderSerializer(serializers.HyperlinkedModelSerializer):
     """JSON serializer for customer orders"""
 
     lineitems = OrderLineItemSerializer(many=True)
+    total = serializers.DecimalField(required=False, max_digits=11, decimal_places=2, read_only=True)
 
     class Meta:
         model = Order
@@ -35,7 +37,7 @@ class OrderSerializer(serializers.HyperlinkedModelSerializer):
             view_name='order',
             lookup_field='id'
         )
-        fields = ('id', 'url', 'created_date', 'payment_type', 'customer', 'lineitems')
+        fields = ('id', 'url', 'created_date', 'payment_type', 'customer', 'lineitems', 'total')
 
 
 class Orders(ViewSet):
@@ -69,7 +71,7 @@ class Orders(ViewSet):
         """
         try:
             customer = Customer.objects.get(user=request.auth.user)
-            order = Order.objects.get(pk=pk, customer=customer)
+            order = Order.objects.get(pk=pk, customer=customer).annotate(total=Sum("lineitems__product__price"))
             serializer = OrderSerializer(order, context={'request': request})
             return Response(serializer.data)
 
@@ -140,7 +142,7 @@ class Orders(ViewSet):
             ]
         """
         customer = Customer.objects.get(user=request.auth.user)
-        orders = Order.objects.filter(customer=customer, payment_type__isnull=False)
+        orders = Order.objects.filter(customer=customer, payment_type__isnull=False).annotate(total=Sum("lineitems__product__price"))
 
         payment = self.request.query_params.get('payment_id', None)
         if payment is not None:
