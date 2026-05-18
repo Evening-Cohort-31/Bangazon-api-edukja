@@ -140,7 +140,7 @@ class Orders(ViewSet):
             ]
         """
         customer = Customer.objects.get(user=request.auth.user)
-        orders = Order.objects.filter(customer=customer)
+        orders = Order.objects.filter(customer=customer, payment_type__isnull=False)
 
         payment = self.request.query_params.get('payment_id', None)
         if payment is not None:
