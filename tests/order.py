@@ -108,7 +108,7 @@ class OrderTests(APITestCase):
         json_response = json.loads(response.content)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(int(json_response["payment_type"][-1]), data["payment_type"])
+        self.assertEqual(int(json_response["payment_type"].split("/")[-1]), data["payment_type"])
 
     # TODO: New line item is not added to closed order
 
