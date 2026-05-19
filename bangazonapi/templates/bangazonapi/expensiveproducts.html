@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+    {% block content %}
+        <h1>Expensive Products (Over $1000)</h1>
+        <ul>
+            {% for product in product_list %}
+                <li>{{ product.description}}  {{product.name}}: ${{product.price}}</li>
+            {% endfor %}
+        </ul>
+    {% endblock content %}
