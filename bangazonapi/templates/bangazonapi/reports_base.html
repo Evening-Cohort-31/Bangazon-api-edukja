@@ -69,8 +69,13 @@
 <script>
   //Event listener for report search
   document.querySelector("#reportSearch").addEventListener("input", (e) => {
+    const savedTab = localStorage.getItem("activeTab");
     const searchTerm = e.target.value.trim().toLowerCase();
-    const reports = document.querySelectorAll(".panel-options a");
+    const reports = document.querySelectorAll(
+      savedTab !== "all"
+        ? `.panel-options a[data-category=${savedTab}]`
+        : ".panel-options a",
+    );
 
     reports.forEach((r) => {
       r.hidden = !r.textContent.trim().toLowerCase().includes(searchTerm);
