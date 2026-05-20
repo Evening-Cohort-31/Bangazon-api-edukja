@@ -3,7 +3,7 @@ from bangazonapi.models import Product
 from bangazonapi.views import ProductSerializer
 
 def reports(request):
-    return render(request, 'bangazonapi/reports.html')
+    return render(request, 'bangazonapi/reports_base.html')
 
 def expensiveproducts(request):
     products = Product.objects.filter(price__gt=1000)
