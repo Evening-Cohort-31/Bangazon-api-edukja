@@ -13,6 +13,7 @@ from bangazonapi.models import OrderProduct, Favorite
 from bangazonapi.models import Recommendation
 from .product import ProductSerializer
 from .order import OrderSerializer
+from .paymenttype import PaymentSerializer
 
 
 class Profile(ViewSet):
@@ -390,6 +391,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     user = UserSerializer(many=False)
     recommends = RecommenderSerializer(many=True)
+    payment_types = PaymentSerializer(many=True)
 
     class Meta:
         model = Customer
