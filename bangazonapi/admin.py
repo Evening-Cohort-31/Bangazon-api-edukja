@@ -1,5 +1,5 @@
 from django.contrib import admin
-from bangazonapi.models import Customer, Favorite, Order, OrderProduct, Payment, Product, ProductCategory, ProductRating, Rating, Recommendation
+from bangazonapi.models import Customer, Favorite, Order, OrderProduct, Payment, Product, ProductCategory, ProductRating, Rating, Recommendation, Store
 
 # Register your models here.
 admin.site.register(Customer)
@@ -12,3 +12,4 @@ admin.site.register(ProductCategory)
 admin.site.register(ProductRating)
 admin.site.register(Rating)
 admin.site.register(Recommendation)
+admin.site.register(Store)
