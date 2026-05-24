@@ -6,8 +6,10 @@ from rest_framework import status
 from bangazonapi.models import Customer
 
 
+
 class CustomerSerializer(serializers.HyperlinkedModelSerializer):
     """JSON serializer for customers"""
+
     class Meta:
         model = Customer
         url = serializers.HyperlinkedIdentityField(

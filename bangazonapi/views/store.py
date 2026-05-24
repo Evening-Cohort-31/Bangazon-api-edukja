@@ -5,16 +5,24 @@ from rest_framework.response import Response
 from bangazonapi.models import Store, Customer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from django.http import HttpResponseServerError
-
+from .product import ProductSerializer
 
 class StoreSerializer(serializers.HyperlinkedModelSerializer):
     """JSON serializer for stores"""
 
+    products = ProductSerializer(many=True)
+
     class Meta:
         model = Store
         url = serializers.HyperlinkedIdentityField(view_name="store", lookup_field="id")
-        fields = ("id", "url", "name", "description", "customer")
-
+        fields = (
+            "id",
+            "url",
+            "name",
+            "description",
+            "customer",
+            "products",
+        )
 
 class Stores(ViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
