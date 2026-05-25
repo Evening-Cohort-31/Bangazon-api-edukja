@@ -106,6 +106,14 @@ class Orders(ViewSet):
         """
         customer = Customer.objects.get(user=request.auth.user)
         order = Order.objects.get(pk=pk, customer=customer)
+        order_products = OrderProduct.objects.filter(order=order)
+        out_of_stock = []
+        for product in order_products:
+            if product.product.stock < 1:
+                out_of_stock.append(product.product.name)
+        if len(out_of_stock) > 0:
+            message = ", ".join(out_of_stock)
+            return Response({"message": message}, status=status.HTTP_200_OK)
         order.payment_type_id = request.data["payment_type"]
         order.save()
 

@@ -35,6 +35,8 @@ class Cart(ViewSet):
 
         line_item = OrderProduct()
         line_item.product = Product.objects.get(pk=request.data["product_id"])
+        if (line_item.product.stock < 1):
+            return Response({'message': f"{line_item.product.name} is currently out of stock"}, status=status.HTTP_200_OK)
         line_item.order = open_order
         line_item.save()
 
