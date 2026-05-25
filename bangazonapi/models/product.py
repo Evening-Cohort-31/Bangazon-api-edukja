@@ -64,7 +64,7 @@ class Product(SafeDeleteModel):
         Returns:
             int -- Number of items still in stock
         """
-        stock = self.quantity - self.number_sold
+        stock = int(self.quantity) - int(self.number_sold)
         return stock
 
     @property

@@ -105,6 +105,7 @@ class Products(ViewSet):
 
         customer = Customer.objects.get(user=request.auth.user)
         new_product.customer = customer
+        new_product.store = customer.store
 
         product_category = ProductCategory.objects.get(pk=request.data["category_id"])
         new_product.category = product_category
