@@ -58,6 +58,16 @@ class Product(SafeDeleteModel):
         return sold.count()
 
     @property
+    def stock(self):
+        """stock property of a product
+
+        Returns:
+            int -- Number of items still in stock
+        """
+        stock = self.quantity - self.number_sold
+        return stock
+
+    @property
     def can_be_rated(self):
         """can_be_rated property, which will be calculated per user
 

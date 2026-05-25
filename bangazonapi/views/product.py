@@ -25,6 +25,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "number_sold",
             "description",
             "quantity",
+            "stock",
             "created_date",
             "location",
             "image_path",
