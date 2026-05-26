@@ -403,6 +403,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "address",
             "payment_types",
             "recommends",
+            "store"
         )
         depth = 1
 

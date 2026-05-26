@@ -6,6 +6,7 @@ from .customer import Customer
 from .productcategory import ProductCategory
 from .orderproduct import OrderProduct
 from .productrating import ProductRating
+from .store import Store
 
 
 class Product(SafeDeleteModel):
@@ -40,6 +41,9 @@ class Product(SafeDeleteModel):
         max_length=None,
         null=True,
     )
+    store = models.ForeignKey(
+        Store, on_delete=models.DO_NOTHING, related_name="products"
+    )
 
     @property
     def number_sold(self):
@@ -52,6 +56,16 @@ class Product(SafeDeleteModel):
             product=self, order__payment_type__isnull=False
         )
         return sold.count()
+
+    @property
+    def stock(self):
+        """stock property of a product
+
+        Returns:
+            int -- Number of items still in stock
+        """
+        stock = int(self.quantity) - int(self.number_sold)
+        return stock
 
     @property
     def can_be_rated(self):
