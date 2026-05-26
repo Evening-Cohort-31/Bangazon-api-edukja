@@ -71,7 +71,7 @@ class Orders(ViewSet):
         """
         try:
             customer = Customer.objects.get(user=request.auth.user)
-            order = Order.objects.get(pk=pk, customer=customer).annotate(total=Sum("lineitems__product__price"))
+            order = Order.objects.annotate(total=Sum("lineitems__product__price")).get(pk=pk, customer=customer)
             serializer = OrderSerializer(order, context={'request': request})
             return Response(serializer.data)
 
