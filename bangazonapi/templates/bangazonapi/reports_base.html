@@ -1,0 +1,123 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="section">
+  <div class="columns is-centered">
+    <div class="column is-half">
+      <nav class="panel is-success">
+        <p class="panel-heading">Reports</p>
+        <div class="panel-block">
+          <p class="control has-icons-left">
+            <span class="icon">
+              <i class="mdi mdi-magnify"></i>
+            </span>
+            <input
+              id="reportSearch"
+              class="input"
+              type="text"
+              placeholder="Search"
+            />
+          </p>
+        </div>
+        <p class="panel-tabs">
+          <a id="all" class="is-active">All</a>
+          <a id="orders">Orders</a>
+          <a id="products">Products</a>
+          <a id="sellers">Sellers</a>
+        </p>
+        <div class="panel-options">
+          <!--TODO:Add hrefs to each report as they are added -->
+          <a
+            class="panel-block"
+            data-category="products"
+            href="{% url 'expensiveproducts' %}"
+          >
+            <span class="panel-icon">
+              <i class="mdi mdi-text-box-outline"></i>
+            </span>
+            Expensive Products
+          </a>
+          <a class="panel-block" data-category="products">
+            <span class="panel-icon">
+              <i class="mdi mdi-text-box-outline"></i>
+            </span>
+            Inexpensive Products
+          </a>
+          <a class="panel-block" data-category="sellers">
+            <span class="panel-icon">
+              <i class="mdi mdi-text-box-outline"></i>
+            </span>
+            Favorite Sellers
+          </a>
+          <a class="panel-block" data-category="orders">
+            <span class="panel-icon">
+              <i class="mdi mdi-text-box-outline"></i>
+            </span>
+            Completed Orders
+          </a>
+          <a class="panel-block" data-category="orders">
+            <span class="panel-icon">
+              <i class="mdi mdi-text-box-outline"></i>
+            </span>
+            Incomplete Orders
+          </a>
+        </div>
+      </nav>
+    </div>
+    <div class="column is-half">{% block report %} {% endblock %}</div>
+  </div>
+</div>
+<script>
+  //Event listener for report search
+  document.querySelector("#reportSearch").addEventListener("input", (e) => {
+    const savedTab = localStorage.getItem("activeTab");
+    const searchTerm = e.target.value.trim().toLowerCase();
+    const reports = document.querySelectorAll(
+      savedTab !== "all"
+        ? `.panel-options a[data-category=${savedTab}]`
+        : ".panel-options a",
+    );
+
+    reports.forEach((r) => {
+      r.hidden = !r.textContent.trim().toLowerCase().includes(searchTerm);
+    });
+  });
+
+  //Toggles the "is-active" class name for the current report based on the url
+  const current = window.location.pathname;
+  const activeLink = document.querySelector(`.panel-block[href="${current}"]`);
+  if (activeLink) {
+    activeLink.classList.toggle("is-active");
+  }
+
+  //Event listener to add "is-active" class to selected tab
+  document.querySelector(".panel-tabs").addEventListener("click", (e) => {
+    if (e.target.tagName !== "A") return;
+    document
+      .querySelectorAll(".panel-tabs a")
+      .forEach((a) => a.classList.remove("is-active"));
+    localStorage.setItem("activeTab", e.target.id);
+    e.target.classList.add("is-active");
+    const filter = e.target.id;
+    document.querySelectorAll(".panel-block[data-category]").forEach((link) => {
+      link.hidden = filter !== "all" && link.dataset.category !== filter;
+    });
+  });
+
+  //Event listener to add "is-active" class to selected report
+  document.querySelector(".panel-options").addEventListener("click", (e) => {
+    if (e.target.tagName !== "A") return;
+    document
+      .querySelectorAll(".panel-options a")
+      .forEach((a) => a.classList.remove("is-active"));
+    e.target.classList.add("is-active");
+  });
+
+  //Re-adds "is-active" class to tab after page reload
+  const savedTab = localStorage.getItem("activeTab");
+  if (savedTab) {
+    document.querySelector(`#${savedTab}`).click();
+  }
+</script>
+
+{% endblock content %}
+
