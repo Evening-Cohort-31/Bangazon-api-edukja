@@ -262,7 +262,7 @@ class Products(ViewSet):
         """
 
         limit = self.request.query_params.get("limit", None)
-        
+
         products = Product.objects.all()
 
         # Support filtering by category and/or quantity
@@ -271,6 +271,8 @@ class Products(ViewSet):
         order = self.request.query_params.get("order_by", None)
         direction = self.request.query_params.get("direction", None)
         number_sold = self.request.query_params.get("number_sold", None)
+        min_price = self.request.query_params.get("min_price", None)
+        max_price = self.request.query_params.get("max_price", None)
 
 
         if order is not None:
@@ -284,6 +286,12 @@ class Products(ViewSet):
 
         if category is not None:
             products = products.filter(category__id=category)
+
+        if min_price is not None:
+            products = products.filter(price__gte=min_price)
+
+        if max_price is not None:
+            products = products.filter(price__lte=max_price)
 
         if quantity is not None:
             products = products.order_by("-created_date")[: int(quantity)]
