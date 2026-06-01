@@ -107,13 +107,17 @@ class Orders(ViewSet):
         customer = Customer.objects.get(user=request.auth.user)
         order = Order.objects.get(pk=pk, customer=customer)
         order_products = OrderProduct.objects.filter(order=order)
+        if len(order_products) < 1:
+            return Response({"header": "Cart Empty", "message": "Please add products to your cart"}, status=status.HTTP_200_OK)
         out_of_stock = []
         for product in order_products:
             if product.product.stock < 1:
                 out_of_stock.append(product.product.name)
         if len(out_of_stock) > 0:
-            message = ", ".join(out_of_stock)
-            return Response({"message": message}, status=status.HTTP_200_OK)
+            message = """We were unable to complete your order as some of the items in your cart are out of stock. 
+          If you would like to proceed with your purchase, please remove the following items from your cart and try again: """
+            message += ", ".join(out_of_stock)
+            return Response({"header": "Unable to complete order", "message": message}, status=status.HTTP_200_OK)
         order.payment_type_id = request.data["payment_type"]
         order.save()
 
