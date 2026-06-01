@@ -10,22 +10,35 @@ class ProductTests(APITestCase):
         Create a new account and create sample category
         """
         url = "/register"
-        data = {"username": "steve", "password": "Admin8*", "email": "steve@stevebrownlee.com",
-                "address": "100 Infinity Way", "phone_number": "555-1212", "first_name": "Steve", "last_name": "Brownlee"}
-        response = self.client.post(url, data, format='json')
+        data = {
+            "username": "steve",
+            "password": "Admin8*",
+            "email": "steve@stevebrownlee.com",
+            "address": "100 Infinity Way",
+            "phone_number": "555-1212",
+            "first_name": "Steve",
+            "last_name": "Brownlee",
+        }
+        response = self.client.post(url, data, format="json")
         json_response = json.loads(response.content)
         self.token = json_response["token"]
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         url = "/productcategories"
         data = {"name": "Sporting Goods"}
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token)
 
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(url, data, format="json")
         json_response = json.loads(response.content)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(json_response["name"], "Sporting Goods")
+
+        # Create a store for the user so products can be created
+        url = "/stores"
+        data = {"name": "Steve's Store", "description": "Test store for testing"}
+        response = self.client.post(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_create_product(self):
         """
@@ -38,10 +51,10 @@ class ProductTests(APITestCase):
             "quantity": 60,
             "description": "It flies high",
             "category_id": 1,
-            "location": "Pittsburgh"
+            "location": "Pittsburgh",
         }
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
-        response = self.client.post(url, data, format='json')
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token)
+        response = self.client.post(url, data, format="json")
         json_response = json.loads(response.content)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -65,13 +78,13 @@ class ProductTests(APITestCase):
             "description": "It flies very high",
             "category_id": 1,
             "created_date": datetime.date.today(),
-            "location": "Pittsburgh"
+            "location": "Pittsburgh",
         }
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
-        response = self.client.put(url, data, format='json')
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token)
+        response = self.client.put(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-        response = self.client.get(url, data, format='json')
+        response = self.client.get(url, data, format="json")
         json_response = json.loads(response.content)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(json_response["name"], "Kite")
@@ -90,14 +103,34 @@ class ProductTests(APITestCase):
 
         url = "/products"
 
-        response = self.client.get(url, None, format='json')
+        response = self.client.get(url, None, format="json")
         json_response = json.loads(response.content)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(json_response), 3)
 
     # TODO: Delete product
 
-    # TODO: Product can be rated. Assert average rating exists.
+    def test_rate_product(self):
+        """
+        Ensure a product can be rated and average_rating is correct.
+        """
+        # First, create a product so there's something to rate
+        self.test_create_product()
+
+        # Rate the product
+        url = "/products/1/rate_product"
+        data = {"rating": 4}
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token)
+        response = self.client.post(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Get the product and verify average_rating exists and is correct
+        url = "/products/1"
+        response = self.client.get(url, None, format="json")
+        json_response = json.loads(response.content)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("average_rating", json_response)
+        self.assertEqual(json_response["average_rating"], 4)
 
     # TODO: GET Single Product
 

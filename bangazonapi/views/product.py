@@ -9,9 +9,10 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
-from bangazonapi.models import Product, Customer, ProductCategory
+from bangazonapi.models import Product, Customer, ProductCategory, ProductRating
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.parsers import MultiPartParser, FormParser
+
 
 class ProductSerializer(serializers.ModelSerializer):
     """JSON serializer for products"""
@@ -32,12 +33,14 @@ class ProductSerializer(serializers.ModelSerializer):
             "average_rating",
             "can_be_rated",
             "category",
-            "store"
+            "store",
         )
         depth = 1
 
+
 class Products(ViewSet):
     """Request handlers for Products in the Bangazon Platform"""
+
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def create(self, request):
@@ -262,7 +265,7 @@ class Products(ViewSet):
         """
 
         limit = self.request.query_params.get("limit", None)
-        
+
         products = Product.objects.all()
 
         # Support filtering by category and/or quantity
@@ -271,7 +274,6 @@ class Products(ViewSet):
         order = self.request.query_params.get("order_by", None)
         direction = self.request.query_params.get("direction", None)
         number_sold = self.request.query_params.get("number_sold", None)
-
 
         if order is not None:
             order_filter = order
@@ -298,7 +300,7 @@ class Products(ViewSet):
             products = filter(sold_filter, products)
 
         if limit is not None:
-            products = products[:int(limit)]
+            products = products[: int(limit)]
 
         serializer = ProductSerializer(
             products, many=True, context={"request": request}
@@ -318,5 +320,30 @@ class Products(ViewSet):
             rec.save()
 
             return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+        return Response(None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @action(methods=["post"], detail=True)
+    def rate_product(self, request, pk=None):
+        """Rate a product"""
+
+        if request.method == "POST":
+            try:
+                product = Product.objects.get(pk=pk)
+            except Product.DoesNotExist:
+                return Response(
+                    {"message": "Product not found"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            customer = Customer.objects.get(user=request.auth.user)
+
+            new_rating = ProductRating()
+            new_rating.product = product
+            new_rating.customer = customer
+            new_rating.rating = int(request.data["rating"])
+            new_rating.save()
+
+            return Response({"message": "Rating added"}, status=status.HTTP_201_CREATED)
 
         return Response(None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
